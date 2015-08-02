@@ -24,7 +24,8 @@
 
 import aiohttp
 import asyncio
-import bitcoin.core
+import bitcoin
+import bitcoin.rpc
 import json
 
 
