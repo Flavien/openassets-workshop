@@ -100,12 +100,11 @@ class BitcoinCoreProvider(AbstractBlockchainProvider):
         return self._proxy.sendrawtransaction(transaction)
 
 
-class ChainApiProvider(AbstractBlockchainProvider):
+class CoinprismApiProvider(AbstractBlockchainProvider):
     """Represents a Blockchain provider using the chain.com API."""
 
-    def __init__(self, base_url, api_key, api_secret, fallback_provider, loop):
+    def __init__(self, base_url, fallback_provider, loop):
         self._base_url = base_url
-        self._auth = aiohttp.BasicAuth(api_key, api_secret)
         self._fallback_provider = fallback_provider
         self._loop = loop
 
@@ -136,7 +135,7 @@ class ChainApiProvider(AbstractBlockchainProvider):
             for input in data['inputs']],
             vout=[bitcoin.core.CTxOut(
                 nValue=output['value'],
-                scriptPubKey=bitcoin.core.CScript(bitcoin.core.x(output['script_hex']))
+                scriptPubKey=bitcoin.core.CScript(bitcoin.core.x(output['script']))
             )
             for output in data['outputs']]
         )
@@ -157,5 +156,5 @@ class ChainApiProvider(AbstractBlockchainProvider):
 
     @asyncio.coroutine
     def _get(self, url):
-        response = yield from aiohttp.request('GET', self._base_url + url, auth=self._auth, loop=self._loop)
+        response = yield from aiohttp.request('GET', self._base_url + url, loop=self._loop)
         return (yield from response.read())
